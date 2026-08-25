@@ -2,7 +2,8 @@
   'use strict';
 
   const API_URL = 'https://script.google.com/macros/s/AKfycbxvqWwNRKu5GpoVRyDZGdwXRy6ubEgPAg2-stv-G-arF4HRoqkAfP21oTl124ne6CvZ/exec?mode=facebook';
-  const state = { items: [] };
+  const PAGE_SIZE = 4;
+  const state = { items: [], filteredItems: [], page: 0 };
 
   const esc = value => String(value ?? '')
     .replaceAll('&','&amp;').replaceAll('<','&lt;')
@@ -14,6 +15,34 @@
     return /^https:\/\//i.test(url) ? url : '';
   };
 
+  function dateValue(dateText) {
+    const text = String(dateText || '').trim();
+    if (!text) return 0;
+
+    const match = text.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+    if (!match) {
+      const parsed = Date.parse(text);
+      return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    let day = Number(match[1]);
+    let month = Number(match[2]) - 1;
+    let year = Number(match[3]);
+
+    if (year < 100) year += 2500;
+    if (year >= 2400) year -= 543;
+
+    return new Date(year, month, day).getTime();
+  }
+
+  function sortLatest(items) {
+    return [...items].sort((a, b) => {
+      const byDate = dateValue(b.date) - dateValue(a.date);
+      if (byDate !== 0) return byDate;
+      return String(a.area || '').localeCompare(String(b.area || ''), 'th');
+    });
+  }
+
   function scaleFrames() {
     document.querySelectorAll('.fb-card-preview').forEach(box => {
       const iframe = box.querySelector('iframe');
@@ -24,32 +53,55 @@
 
   function fillAreaFilter(items) {
     const select = document.getElementById('fbAreaFilter');
-    const areas = [...new Set(items.map(item => String(item.area || '').trim()).filter(Boolean))]
-      .sort((a,b) => a.localeCompare(b,'th'));
+    const areas = [...new Set(
+      items.map(item => String(item.area || '').trim()).filter(Boolean)
+    )].sort((a,b) => a.localeCompare(b,'th'));
 
     select.innerHTML =
       '<option value="">ทุกพื้นที่</option>' +
       areas.map(area => `<option value="${esc(area)}">${esc(area)}</option>`).join('');
   }
 
+  function updateFilteredItems(resetPage = false) {
+    const selected = document.getElementById('fbAreaFilter').value;
+    state.filteredItems = sortLatest(
+      state.items.filter(item => !selected || item.area === selected)
+    );
+
+    if (resetPage) state.page = 0;
+
+    const maxPage = Math.max(0, Math.ceil(state.filteredItems.length / PAGE_SIZE) - 1);
+    if (state.page > maxPage) state.page = maxPage;
+  }
+
   function render() {
     const grid = document.getElementById('fbPageGrid');
     const status = document.getElementById('fbPageStatus');
     const count = document.getElementById('fbResultCount');
+    const controls = document.getElementById('fbSliderControls');
+    const prevBtn = document.getElementById('fbPrevBtn');
+    const nextBtn = document.getElementById('fbNextBtn');
+    const indicator = document.getElementById('fbPageIndicator');
     const selected = document.getElementById('fbAreaFilter').value;
 
-    const items = state.items.filter(item => !selected || item.area === selected);
-    count.textContent = `พบ ${items.length} รายการ`;
+    const total = state.filteredItems.length;
+    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const start = state.page * PAGE_SIZE;
+    const visibleItems = state.filteredItems.slice(start, start + PAGE_SIZE);
 
-    if (!items.length) {
+    count.textContent = `พบ ${total} รายการ`;
+
+    if (!total) {
       grid.innerHTML = '';
       status.hidden = false;
       status.textContent = selected ? 'ไม่พบโพสต์ในพื้นที่นี้' : 'ยังไม่มีโพสต์ Facebook';
+      controls.hidden = true;
       return;
     }
 
     status.hidden = true;
-    grid.innerHTML = items.map(item => {
+
+    grid.innerHTML = visibleItems.map(item => {
       const embedUrl = safeHttps(item.embedUrl);
       const facebookUrl = safeHttps(item.facebookUrl);
       if (!embedUrl || !facebookUrl) return '';
@@ -89,7 +141,25 @@
       });
     });
 
+    controls.hidden = totalPages <= 1;
+    prevBtn.disabled = state.page <= 0;
+    nextBtn.disabled = state.page >= totalPages - 1;
+    indicator.textContent = `${state.page + 1} / ${totalPages}`;
+
     requestAnimationFrame(scaleFrames);
+  }
+
+  function goPrevious() {
+    if (state.page <= 0) return;
+    state.page -= 1;
+    render();
+  }
+
+  function goNext() {
+    const totalPages = Math.ceil(state.filteredItems.length / PAGE_SIZE);
+    if (state.page >= totalPages - 1) return;
+    state.page += 1;
+    render();
   }
 
   async function load() {
@@ -97,21 +167,31 @@
     try {
       const response = await fetch(API_URL + '&_t=' + Date.now(), {cache:'no-store'});
       if (!response.ok) throw new Error('HTTP ' + response.status);
-      const result = await response.json();
-      if (result.success === false) throw new Error(result.message || 'โหลดข้อมูลไม่สำเร็จ');
 
-      state.items = Array.isArray(result.items) ? result.items : [];
+      const result = await response.json();
+      if (result.success === false) {
+        throw new Error(result.message || 'โหลดข้อมูลไม่สำเร็จ');
+      }
+
+      state.items = sortLatest(Array.isArray(result.items) ? result.items : []);
       fillAreaFilter(state.items);
+      updateFilteredItems(true);
       render();
     } catch (error) {
       console.error('fbpost:', error);
       status.hidden = false;
       status.textContent = 'โหลดโพสต์ Facebook ไม่สำเร็จ';
+      document.getElementById('fbSliderControls').hidden = true;
     }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('fbAreaFilter').addEventListener('change', render);
+    document.getElementById('fbAreaFilter').addEventListener('change', () => {
+      updateFilteredItems(true);
+      render();
+    });
+    document.getElementById('fbPrevBtn').addEventListener('click', goPrevious);
+    document.getElementById('fbNextBtn').addEventListener('click', goNext);
     load();
   });
 
