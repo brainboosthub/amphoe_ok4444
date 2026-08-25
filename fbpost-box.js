@@ -14,6 +14,34 @@
     return /^https:\/\//i.test(url) ? url : '';
   };
 
+  function dateValue(dateText) {
+    const text = String(dateText || '').trim();
+    if (!text) return 0;
+
+    const match = text.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+    if (!match) {
+      const parsed = Date.parse(text);
+      return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    let day = Number(match[1]);
+    let month = Number(match[2]) - 1;
+    let year = Number(match[3]);
+
+    if (year < 100) year += 2500;
+    if (year >= 2400) year -= 543;
+
+    return new Date(year, month, day).getTime();
+  }
+
+  function sortLatest(items) {
+    return [...items].sort((a, b) => {
+      const byDate = dateValue(b.date) - dateValue(a.date);
+      if (byDate !== 0) return byDate;
+      return String(a.area || '').localeCompare(String(b.area || ''), 'th');
+    });
+  }
+
   function scaleFacebookFrames(root) {
     root.querySelectorAll('.fbpost-box-preview').forEach(box => {
       const iframe = box.querySelector('iframe');
@@ -28,7 +56,8 @@
     const grid = document.getElementById('fbpostBoxGrid');
     if (!status || !grid) return;
 
-    const rows = items.slice(0, MAX_HOME_ITEMS);
+    const rows = sortLatest(items).slice(0, MAX_HOME_ITEMS);
+
     if (!rows.length) {
       status.hidden = false;
       status.textContent = 'ยังไม่มีโพสต์ Facebook';
@@ -89,9 +118,14 @@
         method:'GET',
         cache:'no-store'
       });
+
       if (!response.ok) throw new Error('HTTP ' + response.status);
+
       const result = await response.json();
-      if (result.success === false) throw new Error(result.message || 'โหลดข้อมูลไม่สำเร็จ');
+      if (result.success === false) {
+        throw new Error(result.message || 'โหลดข้อมูลไม่สำเร็จ');
+      }
+
       render(Array.isArray(result.items) ? result.items : []);
     } catch (error) {
       console.error('FBpostBox:', error);
