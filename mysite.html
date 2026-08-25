@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="news-manager.css?v=20260825-3" />
   <link rel="stylesheet" href="learning-source-box.css?v=20260819-2" />
   <link rel="stylesheet" href="activity-box.css?v=20260724-1" />
+  <link rel="stylesheet" href="fbpost-box.css?v=20260826-1" />
   <link rel="stylesheet" href="boss-box.css?v=20260723-2" />
   <link rel="stylesheet" href="bus-box.css?v=20260723-1" />
   <link rel="stylesheet" href="cliproom-box.css?v=20260815-3" />
@@ -402,7 +403,7 @@
         <h2>แหล่งเรียนรู้ผ่านแผนที่</h2>
       </div>
 
-      <a class="editwebsite-btn learning-admin-button"
+            <a class="editwebsite-btn learning-admin-button"
          href="addlearning.html"
          target="_blank"
          rel="noopener noreferrer">
@@ -410,7 +411,7 @@
         จัดการแหล่งเรียนรู้
       </a>
 
-      <a id="lsbOpenAll"
+<a id="lsbOpenAll"
          class="lsb-open-all"
          href="learning.html" target="_blank">
         ดูรายการทั้งหมด
@@ -451,7 +452,7 @@
             ★ ข่าวกิจกรรม
         </div>
 
-        <h2>กิจกรรมล่าสุด</h2>
+        <h2>จดหมายข่าว</h2>
     </div>
 
 <a class="activity-box-more-btn"
@@ -466,6 +467,28 @@
     </div>
 
     <div id="activityBoxGrid" class="activity-box-grid"></div>
+  </div>
+</section>
+
+<!-- FBpostBox: โพสต์ Facebook จากชีต facebook ของทุก Spreadsheet ตำบล -->
+<section id="FBpostBox" class="fbpost-box-section" aria-labelledby="fbpostBoxTitle">
+  <div class="fbpost-box-container">
+    <div class="fbpost-box-heading">
+      <div>
+        <div class="activity-box-kicker">★ FACEBOOK</div>
+        <h2 id="fbpostBoxTitle">โพสต์จากพื้นที่</h2>
+      </div>
+
+      <a class="fbpost-box-more-btn" href="fbpost.html">
+        ดูโพสต์ทั้งหมด
+      </a>
+    </div>
+
+    <div id="fbpostBoxStatus" class="fbpost-box-status">
+      กำลังโหลดโพสต์ Facebook...
+    </div>
+
+    <div id="fbpostBoxGrid" class="fbpost-box-grid"></div>
   </div>
 </section>
 
@@ -568,6 +591,7 @@
 <script src="user-box.js?v=20260818-2"></script>
 <script src="learning-source-box.js?v=20260819-2"></script>
   <script src="activity-box.js?v=20260724-1"></script>
+  <script src="fbpost-box.js?v=20260826-3"></script>
   <script src="boss-box.js?v=20260723-2"></script>
   <script src="bus-box.js?v=20260723-1"></script>
   <script src="cliproom-box.js?v=20260815-3"></script>
