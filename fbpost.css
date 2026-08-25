@@ -22,8 +22,48 @@ body{margin:0;font-family:"Anuphan",sans-serif;background:#f4f7fb;color:#111827}
 .fb-card-open{display:flex;align-items:center;gap:7px;margin-top:12px;color:#1877f2;font-size:14px;font-weight:800}
 .fb-page-status{padding:45px 20px;border:1px dashed #cbd5e1;border-radius:18px;background:#fff;color:#64748b;text-align:center}
 .fb-page-status[hidden]{display:none}
-@media(max-width:1150px){.fb-page-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:850px){.fb-page-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.fb-slider-controls{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  margin-top:30px;
+  padding:0 16px;
+}
+.fb-slider-controls[hidden]{display:none}
+.fb-slider-btn{
+  width:58px;
+  height:58px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #d8e1ec;
+  border-radius:50%;
+  background:#fff;
+  color:#1877f2;
+  font-size:22px;
+  cursor:pointer;
+  box-shadow:0 8px 22px rgba(15,23,42,.09);
+  transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease;
+}
+.fb-slider-btn:first-child{justify-self:start}
+.fb-slider-btn:last-child{justify-self:end}
+.fb-slider-btn:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(15,23,42,.14);
+}
+.fb-slider-btn:disabled{opacity:.28;cursor:not-allowed}
+.fb-page-indicator{
+  min-width:78px;
+  padding:8px 14px;
+  border-radius:999px;
+  background:#e8eef6;
+  color:#64748b;
+  text-align:center;
+  font-size:14px;
+  font-weight:700;
+}
+@media(max-width:900px){.fb-page-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){
   .fb-page{padding:28px 0 55px}
   .fb-page-container{width:min(100% - 24px,1320px)}
@@ -35,4 +75,6 @@ body{margin:0;font-family:"Anuphan",sans-serif;background:#f4f7fb;color:#111827}
   .fb-result-count{margin-left:0}
   .fb-page-grid{grid-template-columns:1fr}
   .fb-card-preview{height:430px}
+  .fb-slider-controls{padding:0}
+  .fb-slider-btn{width:50px;height:50px;font-size:19px}
 }
