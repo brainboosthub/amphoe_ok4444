@@ -2,7 +2,7 @@
   'use strict';
 
   const API_URL = 'https://script.google.com/macros/s/AKfycbxvqWwNRKu5GpoVRyDZGdwXRy6ubEgPAg2-stv-G-arF4HRoqkAfP21oTl124ne6CvZ/exec?mode=facebook';
-  const MAX_HOME_ITEMS = 8;
+  const MAX_HOME_ITEMS = 4;
 
   const esc = value => String(value ?? '')
     .replaceAll('&','&amp;').replaceAll('<','&lt;')
