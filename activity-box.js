@@ -42,6 +42,12 @@
 };
   }
 
+  function activityDateValue(value) {
+    const text=String(value||'').trim(),m=text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})/);
+    if(m){let y=Number(m[3]);if(y<100)y+=y>=60?2500:2000;if(y>=2400)y-=543;return new Date(y,Number(m[2])-1,Number(m[1])).getTime()||0}
+    const parsed=Date.parse(text);return Number.isNaN(parsed)?0:parsed;
+  }
+
 
   function renderActivities(items) {
     const grid = document.getElementById('activityBoxGrid');
@@ -131,7 +137,8 @@ async function loadActivities() {
 state.items = (result.activities || [])
   .map(normalizeActivity)
   .filter(item => item.title || item.image)
-  .slice(0, 5);   // แสดงเฉพาะ 5 รายการล่าสุด
+  .sort((a,b)=>activityDateValue(b.date)-activityDateValue(a.date))
+  .slice(0, 4);   // แสดงเฉพาะ 4 รายการล่าสุด
 
     renderActivities(state.items);
 
