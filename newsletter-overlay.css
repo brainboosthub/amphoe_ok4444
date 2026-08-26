@@ -38,3 +38,27 @@
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
 }
+.newsletter-action-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, .72);
+}
+.newsletter-action-dialog {
+  width: min(620px, 94vw);
+  max-height: 92vh;
+  overflow: auto;
+  padding: 24px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .4);
+}
+.newsletter-action-dialog h3 { margin: 0 0 18px; text-align: center; }
+.newsletter-action-buttons { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
+.newsletter-cancel { background: #64748b; }
+.newsletter-action-error { min-height: 22px; color: #dc2626; text-align: center; }
+.newsletter-action-dialog button:disabled { opacity: .65; cursor: wait; }
