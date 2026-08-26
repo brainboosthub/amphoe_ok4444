@@ -141,4 +141,5 @@
   });
 
   document.addEventListener('DOMContentLoaded', load);
+  document.addEventListener('facebook-admin-updated', load);
 })();
