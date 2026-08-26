@@ -44,6 +44,16 @@
     });
   }
 
+  function uniqueLatest(items) {
+    const seen = new Set();
+    return sortLatest(items).filter(item => {
+      const key = String(item.facebookUrl || item.embedUrl || '').trim().toLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
   function scaleFacebookFrames(root) {
     root.querySelectorAll('.fbpost-box-preview').forEach(box => {
       const iframe = box.querySelector('iframe');
@@ -58,7 +68,7 @@
     const grid = document.getElementById('fbpostBoxGrid');
     if (!status || !grid) return;
 
-    const rows = sortLatest(items).slice(0, MAX_HOME_ITEMS);
+    const rows = uniqueLatest(items).slice(0, MAX_HOME_ITEMS);
 
     if (!rows.length) {
       status.hidden = false;
