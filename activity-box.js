@@ -147,5 +147,5 @@ state.items = (result.activities || [])
 }
 
   document.addEventListener('DOMContentLoaded', loadActivities);
+  document.addEventListener('activity-admin-updated', loadActivities);
 })();
-
