@@ -21,9 +21,16 @@
     const q=document.getElementById('newsletterSearch');q?.addEventListener('input',e=>{state.query=e.target.value;state.page=1;rerender()});
     document.getElementById('newsletterAdd')?.addEventListener('click',()=>openEditor());
     document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{state.page=+b.dataset.page;rerender()});
-    document.querySelectorAll('[data-image]').forEach(img=>img.onclick=()=>Swal.fire({imageUrl:img.dataset.image,imageAlt:'ภาพปก',showConfirmButton:false,showCloseButton:true,width:'min(900px,95vw)',customClass:{image:'newsletter-image-large'}}));
+    document.querySelectorAll('[data-image]').forEach(img=>img.onclick=()=>showImageOverlay(img.dataset.image,img.alt));
     document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEditor(state.items.find(x=>x.rowNumber===+b.dataset.edit)));
     document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>remove(+b.dataset.delete));
+  }
+  function showImageOverlay(src,alt){
+    const popup=Swal.getPopup();if(!popup)return;
+    popup.querySelector('.newsletter-image-overlay')?.remove();
+    const layer=document.createElement('div');layer.className='newsletter-image-overlay';
+    layer.innerHTML=`<div class="newsletter-image-dialog" role="dialog" aria-modal="true"><button class="newsletter-image-close" type="button" aria-label="ปิด">&times;</button><img class="newsletter-image-large" src="${esc(src)}" alt="${esc(alt||'ภาพปก')}"></div>`;
+    const close=()=>layer.remove();layer.addEventListener('click',e=>{if(e.target===layer)close()});layer.querySelector('.newsletter-image-close').onclick=close;popup.appendChild(layer);
   }
   function rerender(){const box=document.querySelector('.swal2-html-container');if(box){box.innerHTML=managerHtml();bindManager()}}
   async function openManager(){
