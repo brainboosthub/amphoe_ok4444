@@ -42,10 +42,10 @@
   line-height:1.2;
 }
 
-/* หน้าแรกจอใหญ่แสดง 4 ใบล่าสุด */
+/* จอใหญ่แสดง 5 ใบ */
 .activity-box-grid{
   display:grid;
-  grid-template-columns:repeat(4, minmax(0, 1fr));
+  grid-template-columns:repeat(5, minmax(0, 1fr));
   gap:20px;
 }
 
