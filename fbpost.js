@@ -45,6 +45,16 @@
     });
   }
 
+  function uniqueLatest(items) {
+    const seen = new Set();
+    return sortLatest(items).filter(item => {
+      const key = String(item.facebookUrl || item.embedUrl || '').trim().toLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
   function scaleFrames() {
     document.querySelectorAll('.fb-card-preview').forEach(box => {
       const iframe = box.querySelector('iframe');
@@ -66,7 +76,7 @@
 
   function updateFilteredItems(resetPage = false) {
     const selected = document.getElementById('fbAreaFilter').value;
-    state.filteredItems = sortLatest(
+    state.filteredItems = uniqueLatest(
       state.items.filter(item => !selected || item.area === selected)
     );
 
@@ -175,7 +185,7 @@
         throw new Error(result.message || 'โหลดข้อมูลไม่สำเร็จ');
       }
 
-      state.items = sortLatest(Array.isArray(result.items) ? result.items : []);
+      state.items = uniqueLatest(Array.isArray(result.items) ? result.items : []);
       fillAreaFilter(state.items);
       updateFilteredItems(true);
       render();
