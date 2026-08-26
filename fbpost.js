@@ -37,6 +37,8 @@
 
   function sortLatest(items) {
     return [...items].sort((a, b) => {
+      const byExactTime = Number(b.sortTime || 0) - Number(a.sortTime || 0);
+      if (byExactTime !== 0) return byExactTime;
       const byDate = dateValue(b.date) - dateValue(a.date);
       if (byDate !== 0) return byDate;
       return String(a.area || '').localeCompare(String(b.area || ''), 'th');
